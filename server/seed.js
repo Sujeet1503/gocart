@@ -250,3 +250,4 @@ seedDB().then(() => {
   console.log("🎉 Seeding completed!");
   mongoose.connection.close();
 });
+

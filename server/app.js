@@ -20,8 +20,28 @@ const cartRoutes = require("./routes/cart");
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URL || "mongodb://localhost:27017/gocart")
-.then(() => console.log("DB connected"))
+.then(() => {
+  console.log("DB connected");
+  autoSeed(); // ✅ Auto-seed after connection
+})
 .catch(err => console.log("DB not connected", err));
+
+// Auto-seed function
+const autoSeed = async () => {
+  try {
+    const productCount = await Product.countDocuments();
+    if (productCount === 0) {
+      console.log('🌱 No products found. Seeding database...');
+      const { seedDB } = require('./seed');
+      await seedDB();
+      console.log('✅ Database seeded successfully!');
+    } else {
+      console.log(`✅ Database already has ${productCount} products`);
+    }
+  } catch (error) {
+    console.log('❌ Seeding failed:', error);
+  }
+};
 
 // Middleware
 app.use(express.json());
@@ -30,6 +50,16 @@ app.use(morgan("dev"));
 
 // Routes
 app.use("/cart", cartRoutes);
+
+// ✅ FIXED: Products endpoint - return only products array
+app.get('/products', async (req, res) => {
+    try {
+        const products = await Product.find();
+        res.status(200).json(products); // ✅ Send only products array
+    } catch (err) {
+        res.status(500).json({ message: "Server error", error: err });
+    }
+});
 
 // Register user
 app.post('/register', async (req, res) => {
@@ -69,16 +99,6 @@ app.post('/login', async (req, res) => {
             email: user.email,
             role: user.role
         });
-    } catch (err) {
-        res.status(500).json({ message: "Server error", error: err });
-    }
-});
-
-// Get all products
-app.get('/products', async (req, res) => {
-    try {
-        const products = await Product.find();
-        res.status(200).json({ message: "Products fetched", products });
     } catch (err) {
         res.status(500).json({ message: "Server error", error: err });
     }
@@ -378,6 +398,27 @@ app.delete('/cart/clear', async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err });
   }
+});
+
+// ✅ Manual seed endpoint for testing
+app.get('/run-seed', async (req, res) => {
+  try {
+    const { seedDB } = require('./seed');
+    await seedDB();
+    res.json({ message: 'Database seeded successfully!' });
+  } catch (error) {
+    console.error('Seed error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'Server is running',
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Start server
