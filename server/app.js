@@ -26,20 +26,23 @@ mongoose.connect(process.env.MONGO_URL || "mongodb://localhost:27017/gocart")
 })
 .catch(err => console.log("DB not connected", err));
 
-// Auto-seed function
+// ✅ FIXED: Auto-seed function with correct import
 const autoSeed = async () => {
   try {
     const productCount = await Product.countDocuments();
     if (productCount === 0) {
       console.log('🌱 No products found. Seeding database...');
-      const { seedDB } = require('./seed');
-      await seedDB();
+      
+      // ✅ FIXED: Import the seed function correctly
+      const seedModule = require('./seed');
+      await seedModule.seedDB();
+      
       console.log('✅ Database seeded successfully!');
     } else {
       console.log(`✅ Database already has ${productCount} products`);
     }
   } catch (error) {
-    console.log('❌ Seeding failed:', error);
+    console.log('❌ Seeding failed:', error.message);
   }
 };
 
@@ -403,8 +406,8 @@ app.delete('/cart/clear', async (req, res) => {
 // ✅ Manual seed endpoint for testing
 app.get('/run-seed', async (req, res) => {
   try {
-    const { seedDB } = require('./seed');
-    await seedDB();
+    const seedModule = require('./seed');
+    await seedModule.seedDB();
     res.json({ message: 'Database seeded successfully!' });
   } catch (error) {
     console.error('Seed error:', error);

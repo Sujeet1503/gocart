@@ -246,8 +246,13 @@ const seedDB = async () => {
   console.log("✅ Database seeded with 25 products with real working images!");
 };
 
-seedDB().then(() => {
-  console.log("🎉 Seeding completed!");
-  mongoose.connection.close();
-});
+// ✅ FIXED: Export the function properly
+module.exports = { seedDB };
 
+// ✅ Also keep the direct execution for manual running
+if (require.main === module) {
+  seedDB().then(() => {
+    console.log("🎉 Seeding completed!");
+    mongoose.connection.close();
+  });
+}
