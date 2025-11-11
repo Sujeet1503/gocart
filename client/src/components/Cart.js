@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import { API_BASE_URL } from "../config";
 
 const Cart = () => {
   const [cart, setCart] = useState(null);
@@ -12,7 +13,7 @@ const Cart = () => {
   useEffect(() => {
     const fetchCart = async () => {
       try {
-        const res = await axios.get("http://localhost:8080/cart", {
+        const res = await axios.get(`${API_BASE_URL}/cart`, {
           headers: { token },
         });
         setCart(res.data.cart);
@@ -36,11 +37,11 @@ const Cart = () => {
     if (!window.confirm(`Remove ${productName} from cart?`)) return;
     
     try {
-      await axios.delete("http://localhost:8080/cart/product/delete", {
+      await axios.delete(`${API_BASE_URL}/cart/product/delete`, {
         headers: { token },
         data: { productID: productId }
       });
-      const res = await axios.get("http://localhost:8080/cart", {
+      const res = await axios.get(`${API_BASE_URL}/cart`, {
         headers: { token },
       });
       setCart(res.data.cart);
@@ -54,11 +55,11 @@ const Cart = () => {
     if (newQuantity < 1) return;
     
     try {
-      await axios.put("http://localhost:8080/cart/product/update", 
+      await axios.put(`${API_BASE_URL}/cart/product/update`, 
         { productID: productId, quantity: newQuantity },
         { headers: { token } }
       );
-      const res = await axios.get("http://localhost:8080/cart", {
+      const res = await axios.get(`${API_BASE_URL}/cart`, {
         headers: { token },
       });
       setCart(res.data.cart);

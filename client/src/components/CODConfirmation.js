@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import { API_BASE_URL } from "../config";
 
 const CODConfirmation = () => {
   const [loading, setLoading] = useState(false);
@@ -19,9 +20,9 @@ const CODConfirmation = () => {
       const token = localStorage.getItem("token");
       const shippingAddress = JSON.parse(localStorage.getItem("shippingAddress") || "{}");
       
-      // Create order with COD payment method
+      // ✅ FIXED: Use API_BASE_URL
       await axios.post(
-        "http://localhost:8080/order/create",
+        `${API_BASE_URL}/order/create`,
         { 
           shippingAddress, 
           paymentMethod: "cod" 
@@ -42,7 +43,6 @@ const CODConfirmation = () => {
 
   return (
     <div className="payment-container">
-      {/* Animated Background */}
       <div className="payment-bg-animation">
         <div className="payment-shape shape-1"></div>
         <div className="payment-shape shape-2"></div>
@@ -57,7 +57,6 @@ const CODConfirmation = () => {
       <div className="payment-content-enhanced">
         <div className="cod-confirmation-section-enhanced">
           <div className="confirmation-card-enhanced">
-            {/* Header */}
             <div className="confirmation-header">
               <div className="confirmation-icon-animated">
                 <div className="cash-icon">💰</div>
@@ -71,7 +70,6 @@ const CODConfirmation = () => {
               </div>
             </div>
 
-            {/* Order Timeline */}
             <div className="order-timeline">
               <div className="timeline-item active">
                 <div className="timeline-marker">1</div>
@@ -103,7 +101,6 @@ const CODConfirmation = () => {
               </div>
             </div>
 
-            {/* Delivery Information */}
             <div className="delivery-info-section">
               <h3 className="section-title-cod">🚚 Delivery Information</h3>
               <div className="delivery-card">
@@ -127,7 +124,6 @@ const CODConfirmation = () => {
               </div>
             </div>
 
-            {/* COD Benefits */}
             <div className="cod-benefits-enhanced">
               <h3 className="section-title-cod">🎁 Why Choose COD?</h3>
               <div className="benefits-grid-enhanced">
@@ -162,7 +158,6 @@ const CODConfirmation = () => {
               </div>
             </div>
 
-            {/* Important Instructions */}
             <div className="instructions-section">
               <h3 className="section-title-cod">📋 Important Instructions</h3>
               <div className="instructions-list">
@@ -185,7 +180,6 @@ const CODConfirmation = () => {
               </div>
             </div>
 
-            {/* Terms and Conditions */}
             <div className="terms-section">
               <label className="terms-checkbox">
                 <input
@@ -201,7 +195,6 @@ const CODConfirmation = () => {
               </label>
             </div>
 
-            {/* Confirmation Actions */}
             <div className="confirmation-actions-enhanced">
               <button 
                 onClick={handleCODPayment} 
@@ -227,7 +220,6 @@ const CODConfirmation = () => {
               </Link>
             </div>
 
-            {/* Support Info */}
             <div className="support-info">
               <div className="support-icon">💬</div>
               <div className="support-text">

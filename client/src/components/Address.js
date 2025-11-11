@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import { API_BASE_URL } from "../config";
 
 const Address = () => {
   const [address, setAddress] = useState({
@@ -27,13 +28,11 @@ const Address = () => {
     e.preventDefault();
     setLoading(true);
     
-    // Save address to localStorage
     localStorage.setItem("shippingAddress", JSON.stringify(address));
     
-    // Save address to backend
     const token = localStorage.getItem("token");
     try {
-      await axios.post("http://localhost:8080/address/save", 
+      await axios.post(`${API_BASE_URL}/address/save`, 
         { address },
         { headers: { token } }
       );
@@ -41,7 +40,6 @@ const Address = () => {
       console.log("Address save error:", err);
     }
     
-    // Navigate to payment options
     setTimeout(() => {
       setLoading(false);
       navigate("/payment-options");

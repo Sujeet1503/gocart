@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import { API_BASE_URL } from "../config";
 
 const PaymentOptions = () => {
   const [selectedMethod, setSelectedMethod] = useState("");
@@ -13,7 +14,7 @@ const PaymentOptions = () => {
       const token = localStorage.getItem("token");
       if (token) {
         try {
-          const res = await axios.get("http://localhost:8080/cart", {
+          const res = await axios.get(`${API_BASE_URL}/cart`, {
             headers: { token },
           });
           setCartTotal(res.data.cart?.total || 0);
@@ -32,20 +33,6 @@ const PaymentOptions = () => {
       icon: "📱",
       description: "Fast & secure UPI payment",
       popular: true
-    },
-    {
-      id: "card",
-      name: "Credit/Debit Card",
-      icon: "💳",
-      description: "Pay with your card securely",
-      popular: false
-    },
-    {
-      id: "netbanking",
-      name: "Net Banking",
-      icon: "🏦",
-      description: "Transfer from your bank",
-      popular: false
     },
     {
       id: "cod",
@@ -68,17 +55,12 @@ const PaymentOptions = () => {
 
     setLoading(true);
     
-    // Navigate to specific payment page based on selection
     setTimeout(() => {
       setLoading(false);
       if (selectedMethod === "upi") {
         navigate("/payment");
-      } else if (selectedMethod === "card") {
-        navigate("/card-payment");
       } else if (selectedMethod === "cod") {
         navigate("/cod-confirmation");
-      } else if (selectedMethod === "netbanking") {
-        navigate("/netbanking");
       }
     }, 1000);
   };

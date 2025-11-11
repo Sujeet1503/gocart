@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../config";
 
 const Payment = () => {
   const [qr, setQr] = useState(null);
@@ -20,7 +21,7 @@ const Payment = () => {
   useEffect(() => {
     const fetchCartData = async () => {
       try {
-        const res = await axios.get("http://localhost:8080/cart", {
+        const res = await axios.get(`${API_BASE_URL}/cart`, {
           headers: { token },
         });
         
@@ -34,15 +35,14 @@ const Payment = () => {
           setAmount(total);
           setOrderSummary({
             subtotal: subtotal,
-            shipping: 0, // FREE
+            shipping: 0,
             tax: tax,
             total: total
           });
           
-          // Generate QR for the total amount
           if (subtotal > 0) {
             const paymentRes = await axios.post(
-              "http://localhost:8080/payment",
+              `${API_BASE_URL}/payment`,
               { amount: total, paymentMethod: "upi" }
             );
             setQr(paymentRes.data.qrImage);
@@ -61,11 +61,10 @@ const Payment = () => {
   const handlePaymentSuccess = async () => {
     setPaymentDone(true);
     
-    // Create order
     const shippingAddress = JSON.parse(localStorage.getItem("shippingAddress") || "{}");
     try {
       await axios.post(
-        "http://localhost:8080/order/create",
+        `${API_BASE_URL}/order/create`,
         { 
           shippingAddress, 
           paymentMethod: "upi" 
@@ -76,7 +75,6 @@ const Payment = () => {
       console.log("Order creation error:", err);
     }
     
-    // Redirect to success page after 2 seconds
     setTimeout(() => {
       navigate("/payment-success");
     }, 2000);
@@ -107,7 +105,6 @@ const Payment = () => {
 
   return (
     <div className="payment-container">
-      {/* Animated Background */}
       <div className="payment-bg-animation">
         <div className="payment-shape shape-1"></div>
         <div className="payment-shape shape-2"></div>
@@ -115,8 +112,8 @@ const Payment = () => {
       </div>
 
       <div className="payment-header">
-        <h1>💳 Complete Your Payment</h1>
-        <p>Secure and fast payment processing</p>
+        <h1>📱 UPI Payment</h1>
+        <p>Scan QR code to complete payment</p>
       </div>
 
       <div className="payment-content-enhanced">
@@ -157,17 +154,6 @@ const Payment = () => {
               <div className="total-line grand-total">
                 <span>Total Amount:</span>
                 <span className="amount">₹{orderSummary.total.toFixed(2)}</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="payment-methods-section">
-            <h3>📱 UPI Payment</h3>
-            <div className="method-option active">
-              <div className="method-icon">📱</div>
-              <div className="method-info">
-                <h4>Scan & Pay</h4>
-                <p>Scan QR code with any UPI app</p>
               </div>
             </div>
           </div>

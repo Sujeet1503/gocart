@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../config";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -26,11 +27,13 @@ const Products = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get("http://localhost:8080/products");
-        setProducts(res.data.products);
-        setFilteredProducts(res.data.products);
+        const res = await axios.get(`${API_BASE_URL}/products`);
+        // ✅ FIXED: Now res.data is directly the products array
+        setProducts(res.data);
+        setFilteredProducts(res.data);
       } catch (err) {
         console.log("Products fetch error:", err.response?.data || err.message);
+        setProducts([]); // Set empty array on error
       } finally {
         setLoading(false);
       }
@@ -74,45 +77,39 @@ const Products = () => {
   const getProductCategory = (product) => {
     const name = product.name.toLowerCase();
     
-    // Electronics
     if (name.includes("iphone") || name.includes("samsung") || name.includes("google pixel") || 
         name.includes("macbook") || name.includes("laptop") || name.includes("tablet") || 
         name.includes("watch") || name.includes("camera") || name.includes("ipad")) {
       return "electronics";
     }
     
-    // Gaming
     if (name.includes("playstation") || name.includes("xbox") || name.includes("gaming")) {
       return "gaming";
     }
     
-    // Home Appliances
     if (name.includes("vacuum") || name.includes("dyson") || name.includes("instant pot") || 
         name.includes("thermostat") || name.includes("echo") || name.includes("nest") || 
         name.includes("blender") || name.includes("grill")) {
       return "home";
     }
     
-    // Audio
     if (name.includes("headphone") || name.includes("airpod") || name.includes("audio") || 
         name.includes("jbl") || name.includes("bose") || name.includes("sony wh") || 
         name.includes("soundlink")) {
       return "audio";
     }
     
-    // Fitness
     if (name.includes("fitbit") || name.includes("peloton") || name.includes("bike") || 
         name.includes("fitness") || name.includes("charge")) {
       return "fitness";
     }
     
-    // Fashion
     if (name.includes("nike") || name.includes("adidas") || name.includes("sneaker") || 
         name.includes("shoe") || name.includes("ultraboost")) {
       return "fashion";
     }
     
-    return "electronics"; // default category
+    return "electronics";
   };
 
   const toggleSelect = (id) => {
@@ -138,7 +135,7 @@ const Products = () => {
 
     try {
       await axios.post(
-        "http://localhost:8080/cart/add",
+        `${API_BASE_URL}/cart/add`,
         { products: selectedProducts },
         { headers: { token } }
       );
@@ -161,10 +158,9 @@ const Products = () => {
     }
   };
 
-  // Fallback image handler
   const handleImageError = (e) => {
     e.target.src = "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=200&fit=crop";
-    e.target.onerror = null; // Prevent infinite loop
+    e.target.onerror = null;
   };
 
   if (loading) {
